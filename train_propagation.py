@@ -8,13 +8,10 @@ from graph_dataset import TrainScheduleDataset
 device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset("./tmp/train_schedules")
-schedule_loader = DataLoader(schedule_data, batch_size=8)
+schedule_loader = DataLoader(schedule_data, batch_size=128)
 model = Net().to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
-
-schedule_data.generate_data_point()
-
 
 def train():
     model.train()
@@ -30,9 +27,11 @@ def train():
     return loss
 
 
-for epoch in range(10):
+for epoch in range(1000):
     loss = train()
     print("Running epoch {} with a loss of {}".format(epoch, loss))
+
+
 edge_index = torch.tensor([[0, 1],
                            [1, 0],
                            [1, 2],

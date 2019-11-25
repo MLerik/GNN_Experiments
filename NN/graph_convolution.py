@@ -9,8 +9,8 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(1, 1)
-        self.update_mlp = MLP(2, 2)
+        self.mlp = MLP(2, 2)
+        self.update_mlp = MLP(4, 2)
 
     def forward(self, x, edge_index):
         # Step 1: Add self-loops to the adjacency matrix.
@@ -40,8 +40,7 @@ class Net(torch.nn.Module):
         self.msg_passing_3 = MsgPassLayer(4, 4)
 
     def forward(self, data):
-        x, edge_index, batch = data.x, data.edge_index, data.batch
-
+        x, edge_index = data.x, data.edge_index
         x = self.msg_passing_1(x, edge_index)
         x = F.relu(x)
         x = self.msg_passing_2(x, edge_index)
@@ -61,5 +60,5 @@ class MLP(Module):
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
-        x = F.softmax(self.fc2(x))
+        x = F.relu(self.fc2(x))
         return x
