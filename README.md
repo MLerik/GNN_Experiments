@@ -73,3 +73,25 @@ O--O--O--1
  
  Because future problems will involve much more complex schedules and non-local effects we want to do multiple message passing steps for each time step of the graph.
  In future models we will also introduce some recurrent network structure to have a better representation of time.
+ 
+ ### Train position propagation multi path
+ 
+ We look at the following infrastructure graph
+ 
+ ```
+           O--O--O
+          /       \
+A: O--O--O--O--O--O--O--O--O  :B
+
+```
+
+and introduce a second train. We thus have two train:
+
+- One travelling A --> B
+- One travelling B --> A
+
+We set up the experiment in multiple phases:
+
+1. Teach the network to propagate the two trains independantly to their goals
+2. Teach network that there are multiple paths in the system
+3. Teach network to adapt the probabilities when the other train is present.
