@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.data import Data
+from torch_geometric.data import Data, DataLoader
 
 from NN.graph_convolution import Net
 from graph_dataset import TrainScheduleDataset
@@ -8,7 +8,7 @@ from graph_dataset import TrainScheduleDataset
 device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset("./tmp/train_schedules")
-schedule_loader = schedule_data  # DataLoader(schedule_data, batch_size=128)
+schedule_loader = DataLoader(schedule_data, batch_size=8)
 model = Net().to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
@@ -30,7 +30,7 @@ def train():
     return loss
 
 
-for epoch in range(100):
+for epoch in range(10):
     loss = train()
     print("Running epoch {} with a loss of {}".format(epoch, loss))
 edge_index = torch.tensor([[0, 1],
@@ -48,12 +48,12 @@ positions = torch.tensor([[0, 0],
                           [0, 3],
                           [1, 3]
                           ], dtype=torch.long)
-current_grid = schedule_data.generate_data_point(0)
+current_graph = schedule_data.generate_data_point(0)
 
 for fun in range(4):
     print("=============================================")
     if fun == 0:
-        nex_step = current_grid
+        nex_step = current_graph
     else:
         nex_step = Data(x=output, y=output, edge_index=edge_index.t().contiguous(), pos=positions)
     output = model(nex_step)
