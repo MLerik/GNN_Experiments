@@ -9,8 +9,8 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(6, 6)
-        self.update_mlp = MLP(12, 6)
+        self.mlp = MLP(in_dim, out_dim)
+        self.update_mlp = MLP(2 * in_dim, out_dim)
 
     def forward(self, x, edge_index):
         """
@@ -25,7 +25,8 @@ class MsgPassLayer(MessagePassing):
         -------
         Returns the state of the graph after message passing
         """
-        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        # Add self loops to nodes
+        # edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
         return self.propagate(edge_index=edge_index, size=(x.size(0), x.size(0)), x=x)
@@ -62,9 +63,9 @@ class Net(torch.nn.Module):
     """
     def __init__(self):
         super(Net, self).__init__()
-        self.msg_passing_1 = MsgPassLayer(4, 4)
-        self.msg_passing_2 = MsgPassLayer(4, 4)
-        self.msg_passing_3 = MsgPassLayer(4, 4)
+        self.msg_passing_1 = MsgPassLayer(6, 6)
+        self.msg_passing_2 = MsgPassLayer(6, 6)
+        self.msg_passing_3 = MsgPassLayer(6, 6)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
