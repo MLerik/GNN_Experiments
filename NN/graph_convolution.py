@@ -61,11 +61,11 @@ class Net(torch.nn.Module):
 
     Currently we fixed number of message passes to 3. This will change and become a hyperparameter
     """
-    def __init__(self):
+    def __init__(self, features):
         super(Net, self).__init__()
-        self.msg_passing_1 = MsgPassLayer(6, 6)
-        self.msg_passing_2 = MsgPassLayer(6, 6)
-        self.msg_passing_3 = MsgPassLayer(6, 6)
+        self.msg_passing_1 = MsgPassLayer(features, features)
+        self.msg_passing_2 = MsgPassLayer(features, features)
+        self.msg_passing_3 = MsgPassLayer(features, features)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
