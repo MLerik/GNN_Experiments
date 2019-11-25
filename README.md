@@ -70,3 +70,6 @@ O--O--O--1
 
 ```
  This is a very simple dataset ;) and its only intention is to get a basic understanding of how pytoch geometric works.
+ 
+ Because future problems will involve much more complex schedules and non-local effects we want to do multiple message passing steps for each time step of the graph.
+ In future models we will also introduce some recurrent network structure to have a better representation of time.
