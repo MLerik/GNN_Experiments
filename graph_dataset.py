@@ -26,7 +26,7 @@ class TrainScheduleDataset(InMemoryDataset):
         # Read data into huge `Data` list.
         print("Reading in")
         data_list = []
-        for i in range(1000):
+        for i in range(500):
             tmp_data = self.generate_data_point()
             data_list.append(tmp_data)
         data, slices = self.collate(data_list)
@@ -38,13 +38,18 @@ class TrainScheduleDataset(InMemoryDataset):
             current_position = np.random.randint(4)
         else:
             current_position = position
-        next_position = int(np.clip(current_position + 1, 0, 3))
-        input_data = np.zeros(shape=(5, 2), dtype=float)
-        output_data = np.zeros(shape=(5, 2), dtype=float)
-        input_data[current_position] = [1]
-        output_data[next_position] = [1]
-        input_data[:, 1] = np.arange(5)
-        output_data[:, 1] = np.arange(5)
+
+        if current_position == 2:
+            next_position = np.random.choice([3, 4])
+        else:
+            next_position = int(np.clip(current_position + 1, 0, 3))
+        input_data = np.zeros(shape=(5, 1 + 5), dtype=float)
+        output_data = np.zeros(shape=(5, 1 + 5), dtype=float)
+        input_data[current_position][0] = 1
+        output_data[next_position][0] = 1
+        for i in range(5):
+            input_data[i, i + 1] = 1
+            output_data[i, i + 1] = 1
         input_tensor = torch.tensor(input_data, dtype=torch.float)
         output_tensor = torch.tensor(output_data, dtype=torch.float)
         edge_index = torch.tensor([[0, 1],

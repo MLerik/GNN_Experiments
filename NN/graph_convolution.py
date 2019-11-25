@@ -9,8 +9,8 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(2, 2)
-        self.update_mlp = MLP(4, 2)
+        self.mlp = MLP(6, 6)
+        self.update_mlp = MLP(12, 6)
 
     def forward(self, x, edge_index):
         # Step 1: Add self-loops to the adjacency matrix.
@@ -33,6 +33,11 @@ class MsgPassLayer(MessagePassing):
 
 
 class Net(torch.nn.Module):
+    """
+    Message passing neural network.
+
+    Currently we fixed number of message passes to 3. This will change and become a hyperparameter
+    """
     def __init__(self):
         super(Net, self).__init__()
         self.msg_passing_1 = MsgPassLayer(4, 4)
@@ -51,6 +56,13 @@ class Net(torch.nn.Module):
 
 
 class MLP(Module):
+    """
+    Multi Layer Perceptron for message passing
+
+    This MLP takes the features of a node as an input and outputs a feature vector of the same size.
+
+    We currently use Relu as non-linearity. Once we have updated the feature vector correctly we can work with softmax
+    """
 
     def __init__(self, input_size, output_size, hidsize=16):
         super(MLP, self).__init__()
@@ -59,6 +71,16 @@ class MLP(Module):
         self.fc2 = Linear(hidsize, output_size)
 
     def forward(self, x):
+        """
+        Forward pass of MLP
+        Parameters
+        ----------
+        x: Feature vector containing all features of a node
+
+        Returns
+        -------
+        Feature vector of the same dimensions as input vector
+        """
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        return x
+
+        return F.relu(self.fc2(x))
