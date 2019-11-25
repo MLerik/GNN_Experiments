@@ -13,7 +13,18 @@ class MsgPassLayer(MessagePassing):
         self.update_mlp = MLP(12, 6)
 
     def forward(self, x, edge_index):
-        # Step 1: Add self-loops to the adjacency matrix.
+        """
+        Forward pass of MsgPassLayer
+
+        Parameters
+        ----------
+        x: Features on Nodes in Graph
+        edge_index: Edge indexes of graph
+
+        Returns
+        -------
+        Returns the state of the graph after message passing
+        """
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
@@ -21,7 +32,18 @@ class MsgPassLayer(MessagePassing):
 
     # How to do proper message passing ?
     def message(self, x_j, x_i, flow="source_to_target"):
-        # Generate messages.
+        """
+        Generate message to be passed between node. Messages are generated using a MLP
+        Parameters
+        ----------
+        x_j : Feature vector of source node
+        x_i: Feature vector of target node
+        flow: Flow direction of message
+
+        Returns
+        -------
+        Output from MLP
+        """
         return self.mlp(x_j)  # 0.5 *  x_j
 
     def update(self, aggr_out, x):

@@ -4,7 +4,6 @@ from torch_geometric.data import Data, DataLoader
 
 from NN.graph_convolution import Net
 from graph_dataset import TrainScheduleDataset
-from utils.plotting import graph_plotting_example_1
 
 device = torch.device('cpu')
 
@@ -60,5 +59,4 @@ for t in range(4):
         nex_step = Data(x=output, y=output, edge_index=edge_index.t().contiguous(), pos=positions)
     output = model(nex_step)
     print(output[:,0])
-    graph_plotting_example_1(np.argmax(output[:,0]))
 
