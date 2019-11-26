@@ -77,7 +77,7 @@ O--O--O--1
  ### Train position propagation multi path
  
  We look at the following infrastructure graph
- 
+ TODO add node numbers
  ```
            O--O--O
           /       \

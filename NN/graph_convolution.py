@@ -9,7 +9,7 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(2 *in_dim, out_dim)
+        self.mlp = MLP(in_dim, out_dim)
         self.update_mlp = MLP(2 * in_dim, out_dim)
 
     def forward(self, x, edge_index):
@@ -26,7 +26,7 @@ class MsgPassLayer(MessagePassing):
         Returns the state of the graph after message passing
         """
         # Add self loops to nodes
-        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        #edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
         return self.propagate(edge_index=edge_index, size=(x.size(0), x.size(0)), x=x)
@@ -44,16 +44,17 @@ class MsgPassLayer(MessagePassing):
         -------
         Output from MLP
         """
-        tmp_x = torch.cat([x_j, x_i], dim=1)
+        #tmp_x = torch.cat([x_j, x_i], dim=1)
+        tmp_x = x_j
         return self.mlp(tmp_x)  # 0.5 *  x_j
 
     def update(self, aggr_out, x):
+        # Todo: Understand how to properly use this
         # aggr_out has shape [N, out_channels]
-        new_embedding = torch.cat([aggr_out, x], dim=1)
-        new_embedding = self.update_mlp(new_embedding)
+        #new_embedding = torch.cat([aggr_out, x], dim=1)
+        #new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
-        return new_embedding
-
+        return aggr_out
 
 class Net(torch.nn.Module):
     """
@@ -61,22 +62,31 @@ class Net(torch.nn.Module):
 
     Currently we fixed number of message passes to 3. This will change and become a hyperparameter
     """
-    def __init__(self, features):
+
+    def __init__(self, features, n_nodes):
         super(Net, self).__init__()
+        self.feature_size = features
+        self.nodesize = n_nodes
         self.msg_passing_1 = MsgPassLayer(features, features)
         self.msg_passing_2 = MsgPassLayer(features, features)
         self.msg_passing_3 = MsgPassLayer(features, features)
+        self.readout_mlp = MLP(features * n_nodes, n_nodes, hidsize=64)
 
     def forward(self, data):
-        x, edge_index = data.x, data.edge_index
+        x, edge_index, batch = data.x, data.edge_index, data.batch
         x = self.msg_passing_1(x, edge_index)
-        #x = F.relu(x)
-        #x = self.msg_passing_2(x, edge_index)
-        #x = F.relu(x)
-        #x = self.msg_passing_3(x, edge_index)
-        values, index = torch.max(x, 0)
-
-        return F.relu(x)
+        x = self.msg_passing_2(x, edge_index)
+        x = self.msg_passing_3(x, edge_index)
+        #print(x)
+        # We ask an oracle to look at the hidden messages to deduce the locations of the trains
+        new_shape = int(x.shape[0] / self.nodesize)
+        y = x.view(new_shape, -1)
+        #print(y)
+        y = self.readout_mlp(y)
+        #print(y)
+        #print(data.y)
+        #print("========================================\n ")
+        return y
 
 
 class MLP(Module):
@@ -105,6 +115,8 @@ class MLP(Module):
         -------
         Feature vector of the same dimensions as input vector
         """
-        x = F.relu(self.fc1(x))
-
-        return F.relu(self.fc2(x))
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = F.relu(x)
+        return x

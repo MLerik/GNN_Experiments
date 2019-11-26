@@ -9,9 +9,10 @@ device = torch.device('cpu')
 
 schedule_data = MultiTrainScheduleDataset("./tmp/train_schedules_multi")
 schedule_loader = DataLoader(schedule_data, batch_size=128, shuffle=True)
-model = Net(12+2).to(device)
+#TODO better implementation of magic number ;)
+model = Net(features=12+2, n_nodes=12).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
 
 def train():
     model.train()
@@ -19,7 +20,9 @@ def train():
         data = data.to(device)
         optimizer.zero_grad()
         output = model(data)
+        print(output.shape)
         label = data.y.to(device)
+        print(label.shape)
         loss = F.mse_loss(output, label)
         optimizer.zero_grad()
         loss.backward()
@@ -27,11 +30,12 @@ def train():
     return loss
 
 
-for epoch in range(5000):
+for epoch in range(10000):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))
 
+# Todo get this out of the data
 edge_index = torch.tensor([[0, 1],
                            [1, 0],
                            [1, 2],
@@ -57,6 +61,7 @@ edge_index = torch.tensor([[0, 1],
                            ], dtype=torch.long)
 current_graph = schedule_data.generate_data_point(0, 0)
 
+# Move train to the right
 for t in range(8):
     print("=============================================")
     print("Time step number {}, agent 1 should be at position {}".format(t,t+1))
@@ -70,6 +75,7 @@ for t in range(8):
 
 current_graph = schedule_data.generate_data_point(1, 8)
 
+# Move other train to the left
 for t in range(8):
     print("=============================================")
     print("Time step number {}, agent 2 should be at position {}".format(t,t+1))

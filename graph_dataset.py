@@ -9,6 +9,7 @@ class TrainScheduleDataset(InMemoryDataset):
     def __init__(self, root, transform=None, pre_transform=None):
         super(TrainScheduleDataset, self).__init__(root, transform, pre_transform)
 
+        # Loading data if already present
         self.data, self.slices = torch.load(self.processed_paths[0])
 
     @property
@@ -20,20 +21,30 @@ class TrainScheduleDataset(InMemoryDataset):
         return ['data.pt']
 
     def download(self):
+        """
+        Dummy method, not used as we don't download data
+        Returns
+        -------
+
+        """
         pass
 
     def process(self):
         # Read data into huge `Data` list.
         print("Reading in")
         data_list = []
-        for node in range(5):
-            tmp_data = self.generate_data_point(position=node)
+
+        # Loop over all possible positions (5 Nodes in this example)
+        for node in range(500):
+            tmp_data = self.generate_data_point(position=None)
+
             data_list.append(tmp_data)
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
 
     def generate_data_point(self, position=None):
         """
+        Own implementation, not part of Framework!
         Simple training data generator for simple schedule. Generates tuples of input output data.
         Input is graph at time t and output is graph at time t+1
 
@@ -59,14 +70,17 @@ class TrainScheduleDataset(InMemoryDataset):
         else:
             next_position = int(np.clip(current_position + 1, 0, 3))
         input_data = np.zeros(shape=(5, 1 + 5), dtype=float)
-        output_data = np.zeros(shape=(5, 1 + 5), dtype=float)
+        output_data = np.zeros(shape=(5,), dtype=float)
         input_data[current_position][0] = 1
-        output_data[next_position][0] = 1
+        output_data[next_position] = 1
         for i in range(5):
             input_data[i, i + 1] = 1
-            output_data[i, i + 1] = 1
+            # output_data[i, i + 1] = 1
+        print(input_data)
+        print(output_data)
+        print("================================")
         input_tensor = torch.tensor(input_data, dtype=torch.float)
-        output_tensor = torch.tensor(output_data, dtype=torch.float)
+        output_tensor = torch.tensor([output_data], dtype=torch.float)
         edge_index = torch.tensor([[0, 1],
                                    [1, 0],
                                    [1, 2],
@@ -108,7 +122,7 @@ class MultiTrainScheduleDataset(InMemoryDataset):
         # Read data into huge `Data` list.
         print("Reading in")
         data_list = []
-        #for i in range(1000):
+        # for i in range(1000):
         for train in range(2):
             for node in range(9):
                 tmp_data = self.generate_data_point(train=train, position=node)
@@ -146,7 +160,7 @@ class MultiTrainScheduleDataset(InMemoryDataset):
         input_data = np.zeros(shape=(self.nr_nodes, self.nr_trains + self.nr_nodes), dtype=float)
         output_data = np.zeros(shape=(self.nr_nodes, self.nr_trains + self.nr_nodes), dtype=float)
 
-        # Start by only moving around at the bottom rail
+        # Start by only moving around at the bottom rail thus clipping between 0 and 8
         next_node = np.clip(current_node + int(1 - 2 * current_train), 0, 8)
         input_data[current_node][current_train] = 1
         output_data[next_node][current_train] = 1
@@ -156,6 +170,7 @@ class MultiTrainScheduleDataset(InMemoryDataset):
 
         input_tensor = torch.tensor(input_data, dtype=torch.float)
         output_tensor = torch.tensor(output_data, dtype=torch.float)
+        # TODO: SImplify this process by using igraph?
         edge_index = torch.tensor([[0, 1],
                                    [1, 0],
                                    [1, 2],

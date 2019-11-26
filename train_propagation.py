@@ -4,14 +4,17 @@ from torch_geometric.data import Data, DataLoader
 
 from NN.graph_convolution import Net
 from graph_dataset import TrainScheduleDataset
-
+import numpy as np
 device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset("./tmp/train_schedules")
-schedule_loader = DataLoader(schedule_data, batch_size=128, shuffle=True)
-model = Net(6).to(device)
+schedule_loader = DataLoader(schedule_data, batch_size=6, shuffle=True)
+model = Net(features=6, n_nodes=5).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
+
+a = np.arange(80)
+a = torch.tensor(a)
 
 def train():
     model.train()
@@ -59,5 +62,6 @@ for t in range(4):
     else:
         nex_step = Data(x=output, y=output, edge_index=edge_index.t().contiguous(), pos=positions)
     output = model(nex_step)
+
     print(output[:,0])
 
