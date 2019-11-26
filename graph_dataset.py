@@ -153,6 +153,7 @@ class MultiTrainScheduleDataset(InMemoryDataset):
         for i in range(self.nr_nodes):
             input_data[i, i + self.nr_trains] = 1
             output_data[i, i + self.nr_trains] = 1
+
         input_tensor = torch.tensor(input_data, dtype=torch.float)
         output_tensor = torch.tensor(output_data, dtype=torch.float)
         edge_index = torch.tensor([[0, 1],

@@ -52,7 +52,7 @@ class MsgPassLayer(MessagePassing):
         new_embedding = torch.cat([aggr_out, x], dim=1)
         new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
-        return aggr_out
+        return new_embedding
 
 
 class Net(torch.nn.Module):
