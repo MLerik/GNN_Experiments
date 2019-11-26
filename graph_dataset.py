@@ -111,7 +111,7 @@ class MultiTrainScheduleDataset(InMemoryDataset):
         #for i in range(1000):
         for train in range(2):
             for node in range(9):
-                tmp_data = self.generate_data_point(train=0, position=node)
+                tmp_data = self.generate_data_point(train=train, position=node)
                 data_list.append(tmp_data)
         data, slices = self.collate(data_list)
         print("Generated {} data point".format(len(data_list)))

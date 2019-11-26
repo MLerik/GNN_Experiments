@@ -29,7 +29,8 @@ def train():
 
 for epoch in range(5000):
     loss = train()
-    print("Running epoch {} with a loss of {}".format(epoch, loss))
+    if epoch % 100 == 0:
+        print("Running epoch {} with a loss of {}".format(epoch, loss))
 
 edge_index = torch.tensor([[0, 1],
                            [1, 0],
@@ -58,7 +59,7 @@ current_graph = schedule_data.generate_data_point(0, 0)
 
 for t in range(8):
     print("=============================================")
-    print("Time step number {}, agent should be at position {}".format(t,t+1))
+    print("Time step number {}, agent 1 should be at position {}".format(t,t+1))
     print("=============================================")
     if t == 0:
         nex_step = current_graph
@@ -69,9 +70,9 @@ for t in range(8):
 
 current_graph = schedule_data.generate_data_point(1, 8)
 
-for t in range(4):
+for t in range(8):
     print("=============================================")
-    print("Time step number {}, agent should be at position {}".format(t,t+1))
+    print("Time step number {}, agent 2 should be at position {}".format(t,t+1))
     print("=============================================")
     if t == 0:
         nex_step = current_graph

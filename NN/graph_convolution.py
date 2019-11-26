@@ -49,8 +49,8 @@ class MsgPassLayer(MessagePassing):
 
     def update(self, aggr_out, x):
         # aggr_out has shape [N, out_channels]
-        #new_embedding = torch.cat([aggr_out, x], dim=1)
-        #new_embedding = self.update_mlp(new_embedding)
+        new_embedding = torch.cat([aggr_out, x], dim=1)
+        new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
         return aggr_out
 
@@ -70,10 +70,11 @@ class Net(torch.nn.Module):
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
         x = self.msg_passing_1(x, edge_index)
-        x = F.relu(x)
-        x = self.msg_passing_2(x, edge_index)
-        x = F.relu(x)
-        x = self.msg_passing_3(x, edge_index)
+        #x = F.relu(x)
+        #x = self.msg_passing_2(x, edge_index)
+        #x = F.relu(x)
+        #x = self.msg_passing_3(x, edge_index)
+        values, index = torch.max(x, 0)
 
         return F.relu(x)
 

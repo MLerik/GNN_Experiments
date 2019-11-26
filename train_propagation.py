@@ -27,9 +27,10 @@ def train():
     return loss
 
 
-for epoch in range(500):
+for epoch in range(5000):
     loss = train()
-    print("Running epoch {} with a loss of {}".format(epoch, loss))
+    if epoch % 100 == 0:
+        print("Running epoch {} with a loss of {}".format(epoch, loss))
 
 
 edge_index = torch.tensor([[0, 1],
