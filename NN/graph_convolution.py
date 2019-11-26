@@ -9,7 +9,7 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(in_dim, out_dim)
+        self.mlp = MLP(2 *in_dim, out_dim)
         self.update_mlp = MLP(2 * in_dim, out_dim)
 
     def forward(self, x, edge_index):
@@ -26,12 +26,11 @@ class MsgPassLayer(MessagePassing):
         Returns the state of the graph after message passing
         """
         # Add self loops to nodes
-        # edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
         return self.propagate(edge_index=edge_index, size=(x.size(0), x.size(0)), x=x)
 
-    # How to do proper message passing ?
     def message(self, x_j, x_i, flow="source_to_target"):
         """
         Generate message to be passed between node. Messages are generated using a MLP
@@ -45,14 +44,15 @@ class MsgPassLayer(MessagePassing):
         -------
         Output from MLP
         """
-        return self.mlp(x_j)  # 0.5 *  x_j
+        tmp_x = torch.cat([x_j, x_i], dim=1)
+        return self.mlp(tmp_x)  # 0.5 *  x_j
 
     def update(self, aggr_out, x):
         # aggr_out has shape [N, out_channels]
-        new_embedding = torch.cat([aggr_out, x], dim=1)
-        new_embedding = self.update_mlp(new_embedding)
+        #new_embedding = torch.cat([aggr_out, x], dim=1)
+        #new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
-        return new_embedding
+        return aggr_out
 
 
 class Net(torch.nn.Module):

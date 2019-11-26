@@ -26,8 +26,8 @@ class TrainScheduleDataset(InMemoryDataset):
         # Read data into huge `Data` list.
         print("Reading in")
         data_list = []
-        for i in range(500):
-            tmp_data = self.generate_data_point()
+        for node in range(5):
+            tmp_data = self.generate_data_point(position=node)
             data_list.append(tmp_data)
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
@@ -108,10 +108,13 @@ class MultiTrainScheduleDataset(InMemoryDataset):
         # Read data into huge `Data` list.
         print("Reading in")
         data_list = []
-        for i in range(1000):
-            tmp_data = self.generate_data_point()
-            data_list.append(tmp_data)
+        #for i in range(1000):
+        for train in range(2):
+            for node in range(9):
+                tmp_data = self.generate_data_point(train=0, position=node)
+                data_list.append(tmp_data)
         data, slices = self.collate(data_list)
+        print("Generated {} data point".format(len(data_list)))
         torch.save((data, slices), self.processed_paths[0])
 
     def generate_data_point(self, position=None, train=None):
@@ -144,7 +147,7 @@ class MultiTrainScheduleDataset(InMemoryDataset):
         output_data = np.zeros(shape=(self.nr_nodes, self.nr_trains + self.nr_nodes), dtype=float)
 
         # Start by only moving around at the bottom rail
-        next_node = np.clip(current_node + int(1 - 2 * current_train), 0, 9)
+        next_node = np.clip(current_node + int(1 - 2 * current_train), 0, 8)
         input_data[current_node][current_train] = 1
         output_data[next_node][current_train] = 1
         for i in range(self.nr_nodes):
@@ -161,11 +164,13 @@ class MultiTrainScheduleDataset(InMemoryDataset):
                                    [3, 4],
                                    [4, 3],
                                    [4, 5],
+                                   [5, 4],
                                    [5, 6],
                                    [6, 5],
                                    [6, 7],
                                    [7, 6],
                                    [7, 8],
+                                   [8, 7],
                                    [2, 9],
                                    [9, 2],
                                    [9, 10],

@@ -9,7 +9,7 @@ device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset("./tmp/train_schedules")
 schedule_loader = DataLoader(schedule_data, batch_size=128, shuffle=True)
-model = Net().to(device)
+model = Net(6).to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 

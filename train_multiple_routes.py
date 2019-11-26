@@ -11,7 +11,7 @@ schedule_data = MultiTrainScheduleDataset("./tmp/train_schedules_multi")
 schedule_loader = DataLoader(schedule_data, batch_size=128, shuffle=True)
 model = Net(12+2).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
 def train():
     model.train()
@@ -27,7 +27,7 @@ def train():
     return loss
 
 
-for epoch in range(500):
+for epoch in range(5000):
     loss = train()
     print("Running epoch {} with a loss of {}".format(epoch, loss))
 
@@ -56,7 +56,7 @@ edge_index = torch.tensor([[0, 1],
                            ], dtype=torch.long)
 current_graph = schedule_data.generate_data_point(0, 0)
 
-for t in range(4):
+for t in range(8):
     print("=============================================")
     print("Time step number {}, agent should be at position {}".format(t,t+1))
     print("=============================================")
