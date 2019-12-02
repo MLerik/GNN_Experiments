@@ -11,7 +11,7 @@ device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset('tmp/')
 schedule_loader = DataLoader(schedule_data, batch_size=6, shuffle=True)
-model = Net(features=14, n_nodes=12).to(device)
+model = Net(n_trains=2, n_nodes=12).to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
 

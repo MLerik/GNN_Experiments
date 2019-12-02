@@ -109,8 +109,8 @@ class TrainScheduleDataset(InMemoryDataset):
             input_tensor = torch.tensor(data_x, dtype=torch.float)
 
         if data_y is None:
-            output_data = np.zeros(shape=(self.nr_nodes, self.nr_trains), dtype=float)
-            output_data[next_node][current_train] = 1
+            output_data = np.zeros(shape=(self.nr_nodes * self.nr_trains,), dtype=float)
+            output_data[next_node + (self.nr_nodes*current_train)] = 1
             output_tensor = torch.tensor([output_data], dtype=torch.float)
         else:
             output_tensor = torch.tensor([data_y], dtype=torch.float)

@@ -63,14 +63,13 @@ class Net(torch.nn.Module):
     Currently we fixed number of message passes to 3. This will change and become a hyperparameter
     """
 
-    def __init__(self, features, n_nodes):
+    def __init__(self, n_trains, n_nodes):
         super(Net, self).__init__()
-        self.feature_size = features
+        self.feature_size = n_trains+n_nodes
         self.nodesize = n_nodes
-        self.msg_passing_1 = MsgPassLayer(features, features)
-        self.msg_passing_2 = MsgPassLayer(features, features)
-        self.msg_passing_3 = MsgPassLayer(features, features)
-        self.readout_mlp = MLP(features * n_nodes, n_nodes, hidsize=64)
+        self.msg_passing_1 = MsgPassLayer(self.feature_size, self.feature_size)
+        self.msg_passing_2 = MsgPassLayer(self.feature_size, self.feature_size)
+        self.readout_mlp = MLP(self.feature_size * n_nodes, n_nodes * n_trains, hidsize=64)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
