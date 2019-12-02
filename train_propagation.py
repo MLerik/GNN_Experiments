@@ -54,6 +54,7 @@ positions = torch.tensor([[0, 0],
                           ], dtype=torch.long)
 current_graph = schedule_data.generate_data_point(0)
 
+model.eval()
 for t in range(4):
     print("=============================================")
     print("Time step number {}, agent should be at position {}".format(t, t + 1))
@@ -61,8 +62,11 @@ for t in range(4):
     if t == 0:
         nex_step = current_graph
     else:
-        nex_step = Data(x=output, y=output, edge_index=edge_index.t().contiguous(), pos=positions)
-    output = model.eval(nex_step)
-    output_data = np.zeros(shape=(5, 1 + 5), dtype=float)
-    output_data[:, 0] = output
-    print(output_data)
+        nex_step = Data(x=input_data, y=input_data, edge_index=edge_index.t().contiguous(), pos=positions)
+    output = model(nex_step)
+    input_data = np.zeros(shape=(5, 1 + 5), dtype=float)
+    input_data[:, 0] = output.detach().numpy()
+    for i in range(5):
+        input_data[i, i + 1] = 1
+    input_data = torch.tensor(input_data, dtype=torch.float)
+    print(input_data)
