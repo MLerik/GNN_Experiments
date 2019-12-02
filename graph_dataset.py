@@ -75,7 +75,6 @@ class TrainScheduleDataset(InMemoryDataset):
         output_data[next_position] = 1
         for i in range(5):
             input_data[i, i + 1] = 1
-            # output_data[i, i + 1] = 1
         print(input_data)
         print(output_data)
         print("================================")

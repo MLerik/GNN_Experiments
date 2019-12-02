@@ -73,10 +73,10 @@ class Net(torch.nn.Module):
         self.readout_mlp = MLP(features * n_nodes, n_nodes, hidsize=64)
 
     def forward(self, data):
-        x, edge_index, batch = data.x, data.edge_index, data.batch
+        x, edge_index = data.x, data.edge_index
         x = self.msg_passing_1(x, edge_index)
         x = self.msg_passing_2(x, edge_index)
-        x = self.msg_passing_3(x, edge_index)
+        #x = self.msg_passing_3(x, edge_index)
         #print(x)
         # We ask an oracle to look at the hidden messages to deduce the locations of the trains
         new_shape = int(x.shape[0] / self.nodesize)
