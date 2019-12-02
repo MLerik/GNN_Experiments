@@ -37,7 +37,7 @@ class TrainScheduleDataset(InMemoryDataset):
 
         # Loading data if already present
         self.data, self.slices = torch.load(self.processed_paths[0])
-
+        self.edge_index = edge_index
     @property
     def raw_file_names(self):
         return ['some_file_1']

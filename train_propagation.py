@@ -11,7 +11,9 @@ device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset('tmp/')
 schedule_loader = DataLoader(schedule_data, batch_size=6, shuffle=True)
-model = Net(n_trains=2, n_nodes=12).to(device)
+n_nodes = 12
+n_trains = 2
+model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
 
@@ -31,13 +33,13 @@ def train():
     return loss
 
 
-for epoch in range(150):
+for epoch in range(200):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))
 
 
-current_graph = schedule_data.generate_data_point(train=0, position=0)
+current_graph = schedule_data.generate_data_point(train=1, position=7)
 
 model.eval()
 for t in range(10):
@@ -49,10 +51,12 @@ for t in range(10):
     else:
         nex_step =schedule_data.generate_data_point(data_x=input_data, data_y=input_data)
     output = model(nex_step)
-    print(output)
-    input_data = np.zeros(shape=(5, 1 + 5), dtype=float)
-    input_data[:, 0] = output.detach().numpy()
-    for i in range(5):
-        input_data[i, i + 1] = 1
+    input_data = np.zeros(shape=(n_nodes, n_trains + n_nodes), dtype=float)
+    for i in range(n_nodes):
+        input_data[i, i + n_trains] = 1
+    output_np = output.detach().numpy()
+    # All still very hacky
+    input_data[:, 0] = output_np[0][:n_nodes]
+    input_data[:, 1] = output_np[0][n_nodes:]
 
-    print(output.detach().numpy())
+    print(output.detach().numpy()[0][:n_nodes])
