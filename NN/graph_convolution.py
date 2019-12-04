@@ -45,16 +45,16 @@ class MsgPassLayer(MessagePassing):
         Output from MLP
         """
         #tmp_x = torch.cat([x_j, x_i], dim=1)
-        tmp_x = x_j
+        tmp_x = x_j+x_i
         return self.mlp(tmp_x)  # 0.5 *  x_j
 
     def update(self, aggr_out, x):
         # Todo: Understand how to properly use this
         # aggr_out has shape [N, out_channels]
-        new_embedding = torch.cat([aggr_out, x], dim=1)
-        new_embedding = self.update_mlp(new_embedding)
+        # new_embedding = torch.cat([aggr_out, x], dim=1)
+        # new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
-        return new_embedding
+        return aggr_out
 
 class Net(torch.nn.Module):
     """

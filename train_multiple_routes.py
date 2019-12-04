@@ -3,16 +3,18 @@ import torch.nn.functional as F
 from torch_geometric.data import Data, DataLoader
 
 from NN.graph_convolution import Net
-from graph_dataset import MultiTrainScheduleDataset
+from graph_dataset import TrainScheduleDataset
 
 device = torch.device('cpu')
 
-schedule_data = MultiTrainScheduleDataset("./tmp/train_schedules_multi")
+schedule_data = TrainScheduleDataset('tmp/')
 schedule_loader = DataLoader(schedule_data, batch_size=128, shuffle=True)
+n_nodes = 12
+n_trains = 2
 #TODO better implementation of magic number ;)
-model = Net(features=12+2, n_nodes=12).to(device)
+model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-6)
 
 def train():
     model.train()
@@ -20,9 +22,7 @@ def train():
         data = data.to(device)
         optimizer.zero_grad()
         output = model(data)
-        print(output.shape)
         label = data.y.to(device)
-        print(label.shape)
         loss = F.mse_loss(output, label)
         optimizer.zero_grad()
         loss.backward()
@@ -30,7 +30,7 @@ def train():
     return loss
 
 
-for epoch in range(10000):
+for epoch in range(250):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))

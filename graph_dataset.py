@@ -86,7 +86,7 @@ class TrainScheduleDataset(InMemoryDataset):
         self.nr_trains = 2
 
         if position is None:
-            current_node = np.random.randint(self.nr_nodes)
+            current_node = np.random.randint(self.nr_nodes-3)
         else:
             current_node = position
 
@@ -94,7 +94,6 @@ class TrainScheduleDataset(InMemoryDataset):
             current_train = np.random.randint(self.nr_trains)
         else:
             current_train = train
-
         # Start by only moving around at the bottom rail thus clipping between 0 and 8
         next_node = np.clip(current_node + int(1 - 2 * current_train), 0, 8)
 
