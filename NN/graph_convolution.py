@@ -72,6 +72,8 @@ class Net(torch.nn.Module):
         self.readout_mlp = MLP(self.feature_size * n_nodes, n_nodes * n_trains, hidsize=64)
 
     def forward(self, data):
+        # TODO: Introduce time as a concept in the model
+        # Todo:Investigate on better propagation models for infromation propagation
         x, edge_index = data.x, data.edge_index
         x = self.msg_passing_1(x, edge_index)
         x = self.msg_passing_2(x, edge_index)

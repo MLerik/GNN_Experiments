@@ -15,7 +15,7 @@ n_nodes = 12
 n_trains = 2
 model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-5)
 
 
 
@@ -33,7 +33,7 @@ def train():
     return loss
 
 
-for epoch in range(200):
+for epoch in range(300):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))
@@ -58,5 +58,7 @@ for t in range(10):
     # All still very hacky
     input_data[:, 0] = output_np[0][:n_nodes]
     input_data[:, 1] = output_np[0][n_nodes:]
-
+    print("Train 0:")
     print(output.detach().numpy()[0][:n_nodes])
+    print("Train 1:")
+    print(output.detach().numpy()[0][n_nodes:])
