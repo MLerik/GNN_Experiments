@@ -33,7 +33,7 @@ def train():
     return loss
 
 
-for epoch in range(300):
+for epoch in range(250):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))

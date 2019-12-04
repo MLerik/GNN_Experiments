@@ -77,17 +77,13 @@ class Net(torch.nn.Module):
         x, edge_index = data.x, data.edge_index
         x = self.msg_passing_1(x, edge_index)
         x = self.msg_passing_2(x, edge_index)
-        #x = self.msg_passing_3(x, edge_index)
-        #print(x)
+
         # We ask an oracle to look at the hidden messages to deduce the locations of the trains
         new_shape = int(x.shape[0] / self.nodesize)
         y = x.view(new_shape, -1)
-        #print(y)
         y = self.readout_mlp(y)
-        #print(y)
-        #print(data.y)
-        #print("========================================\n ")
         return y
+
 
 
 class MLP(Module):
