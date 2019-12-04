@@ -26,7 +26,7 @@ class MsgPassLayer(MessagePassing):
         Returns the state of the graph after message passing
         """
         # Add self loops to nodes
-        #edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
         return self.propagate(edge_index=edge_index, size=(x.size(0), x.size(0)), x=x)
@@ -51,10 +51,10 @@ class MsgPassLayer(MessagePassing):
     def update(self, aggr_out, x):
         # Todo: Understand how to properly use this
         # aggr_out has shape [N, out_channels]
-        #new_embedding = torch.cat([aggr_out, x], dim=1)
-        #new_embedding = self.update_mlp(new_embedding)
+        new_embedding = torch.cat([aggr_out, x], dim=1)
+        new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
-        return aggr_out
+        return new_embedding
 
 class Net(torch.nn.Module):
     """
@@ -69,14 +69,16 @@ class Net(torch.nn.Module):
         self.nodesize = n_nodes
         self.msg_passing_1 = MsgPassLayer(features, features)
         self.msg_passing_2 = MsgPassLayer(features, features)
-        self.msg_passing_3 = MsgPassLayer(features, features)
+        # Too many layer?
+        # self.msg_passing_3 = MsgPassLayer(features, features)
         self.readout_mlp = MLP(features * n_nodes, n_nodes, hidsize=64)
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
         x = self.msg_passing_1(x, edge_index)
         x = self.msg_passing_2(x, edge_index)
-        x = self.msg_passing_3(x, edge_index)
+        # Too many layers?
+        #x = self.msg_passing_3(x, edge_index)
         #print(x)
         # We ask an oracle to look at the hidden messages to deduce the locations of the trains
         new_shape = int(x.shape[0] / self.nodesize)

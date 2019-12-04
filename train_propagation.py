@@ -8,10 +8,10 @@ import numpy as np
 device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset("./tmp/train_schedules")
-schedule_loader = DataLoader(schedule_data, batch_size=6, shuffle=True)
+schedule_loader = DataLoader(schedule_data, batch_size=64, shuffle=True)
 model = Net(features=6, n_nodes=5).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
 a = np.arange(80)
 a = torch.tensor(a)
@@ -62,6 +62,7 @@ for t in range(4):
     else:
         nex_step = Data(x=output, y=output, edge_index=edge_index.t().contiguous(), pos=positions)
     output = model(nex_step)
+
 
     print(output[:,0])
 
