@@ -1,20 +1,23 @@
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch_geometric.data import Data, DataLoader
 
 from NN.graph_convolution import Net
 from graph_dataset import TrainScheduleDataset
-import numpy as np
+
 device = torch.device('cpu')
 
-schedule_data = TrainScheduleDataset("./tmp/train_schedules")
-schedule_loader = DataLoader(schedule_data, batch_size=64, shuffle=True)
-model = Net(features=6, n_nodes=5).to(device)
+
+schedule_data = TrainScheduleDataset('tmp/')
+schedule_loader = DataLoader(schedule_data, batch_size=6, shuffle=True)
+n_nodes = 12
+n_trains = 2
+model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
-a = np.arange(80)
-a = torch.tensor(a)
+
 
 def train():
     model.train()
@@ -30,39 +33,33 @@ def train():
     return loss
 
 
-for epoch in range(5000):
+for epoch in range(200):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))
 
 
-edge_index = torch.tensor([[0, 1],
-                           [1, 0],
-                           [1, 2],
-                           [2, 1],
-                           [2, 3],
-                           [3, 2],
-                           [2, 4],
-                           [4, 2]
-                           ], dtype=torch.long)
-positions = torch.tensor([[0, 0],
-                          [0, 1],
-                          [0, 2],
-                          [0, 3],
-                          [1, 3]
-                          ], dtype=torch.long)
-current_graph = schedule_data.generate_data_point(0)
+current_graph = schedule_data.generate_data_point(train=1, position=7)
 
-for t in range(4):
-    print("=============================================")
-    print("Time step number {}, agent should be at position {}".format(t,t+1))
-    print("=============================================")
+model.eval()
+for t in range(10):
+    print("====================================================")
+    print("Time step number {}, agent should be at position {}".format(t, t + 1))
+    print("====================================================")
     if t == 0:
         nex_step = current_graph
     else:
-        nex_step = Data(x=output, y=output, edge_index=edge_index.t().contiguous(), pos=positions)
+        nex_step =schedule_data.generate_data_point(data_x=input_data, data_y=input_data)
     output = model(nex_step)
+    input_data = np.zeros(shape=(n_nodes, n_trains + n_nodes), dtype=float)
+    for i in range(n_nodes):
+        input_data[i, i + n_trains] = 1
+    output_np = output.detach().numpy()
+    # All still very hacky
+    input_data[:, 0] = output_np[0][:n_nodes]
+    input_data[:, 1] = output_np[0][n_nodes:]
 
+    print(output.detach().numpy()[0][:n_nodes])
 
     print(output[:,0])
 
