@@ -15,7 +15,7 @@ n_nodes = 12
 n_trains = 2
 model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-5)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
 
 
@@ -62,3 +62,6 @@ for t in range(10):
     print(output.detach().numpy()[0][:n_nodes])
     print("Train 1:")
     print(output.detach().numpy()[0][n_nodes:])
+
+    print(output[:,0])
+

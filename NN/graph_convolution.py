@@ -26,7 +26,7 @@ class MsgPassLayer(MessagePassing):
         Returns the state of the graph after message passing
         """
         # Add self loops to nodes
-        #edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
         return self.propagate(edge_index=edge_index, size=(x.size(0), x.size(0)), x=x)
@@ -51,10 +51,10 @@ class MsgPassLayer(MessagePassing):
     def update(self, aggr_out, x):
         # Todo: Understand how to properly use this
         # aggr_out has shape [N, out_channels]
-        #new_embedding = torch.cat([aggr_out, x], dim=1)
-        #new_embedding = self.update_mlp(new_embedding)
+        new_embedding = torch.cat([aggr_out, x], dim=1)
+        new_embedding = self.update_mlp(new_embedding)
         # Step 5: Return new node embeddings.
-        return aggr_out
+        return new_embedding
 
 class Net(torch.nn.Module):
     """
