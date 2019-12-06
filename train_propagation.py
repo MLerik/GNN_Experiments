@@ -9,7 +9,7 @@ from graph_dataset import TrainScheduleDataset
 device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset('tmp/')
-schedule_loader = DataLoader(schedule_data, batch_size=128, shuffle=True)
+schedule_loader = DataLoader(schedule_data, batch_size=64, shuffle=True)
 n_nodes = 12
 n_trains = 2
 model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
