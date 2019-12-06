@@ -9,7 +9,7 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(in_dim, out_dim)
+        self.mlp = MLP(2*in_dim, out_dim)
         self.update_mlp = MLP(2 * in_dim, out_dim)
 
     def forward(self, x, edge_index):
@@ -45,8 +45,8 @@ class MsgPassLayer(MessagePassing):
         Output from MLP
         """
         #tmp_x = torch.cat([x_j, x_i], dim=1)
-        tmp_x = x_j+x_i
-        return self.mlp(tmp_x)  # 0.5 *  x_j
+        tmp_x = x_j
+        return tmp_x #self.mlp(tmp_x)  # 0.5 *  x_j
 
     def update(self, aggr_out, x):
         # Todo: Understand how to properly use this
