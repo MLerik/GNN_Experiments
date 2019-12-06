@@ -26,7 +26,7 @@ class MsgPassLayer(MessagePassing):
         Returns the state of the graph after message passing
         """
         # Add self loops to nodes
-        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        #edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
 
         # Start propagating messages.
         return self.propagate(edge_index=edge_index, size=(x.size(0), x.size(0)), x=x)

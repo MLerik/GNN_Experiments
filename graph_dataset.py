@@ -61,7 +61,7 @@ class TrainScheduleDataset(InMemoryDataset):
         data_list = []
         self.edge_index = edge_index
         # Loop over all possible positions (5 Nodes in this example)
-        for node in range(1000):
+        for node in range(250):
             tmp_data = self.generate_data_point(position=None)
 
             data_list.append(tmp_data)
@@ -87,6 +87,7 @@ class TrainScheduleDataset(InMemoryDataset):
 
         if position is None:
             current_node = np.random.randint(self.nr_nodes)
+            current_node = np.clip(current_node, 0, 8)
         else:
             current_node = position
 
@@ -97,7 +98,7 @@ class TrainScheduleDataset(InMemoryDataset):
         current_train = 0
         # Start by only moving around at the bottom rail thus clipping between 0 and 8
         next_node = np.clip(current_node + int(1 - 2 * current_train), 0, 8)
-
+        print(current_train,current_node,next_node)
         # Load data from previous graph
         if data_x is None:
             input_data = np.zeros(shape=(self.nr_nodes, self.nr_trains + self.nr_nodes), dtype=float)
@@ -114,6 +115,7 @@ class TrainScheduleDataset(InMemoryDataset):
             output_tensor = torch.tensor([output_data], dtype=torch.float)
 
         else:
+
             output_tensor = torch.tensor([data_y], dtype=torch.float)
 
         # Create graph data point

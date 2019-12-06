@@ -9,7 +9,7 @@ from graph_dataset import TrainScheduleDataset
 device = torch.device('cpu')
 
 schedule_data = TrainScheduleDataset('tmp/')
-schedule_loader = DataLoader(schedule_data, batch_size=64, shuffle=True)
+schedule_loader = DataLoader(schedule_data, batch_size=32, shuffle=True)
 n_nodes = 12
 n_trains = 2
 model = Net(n_trains=n_trains, n_nodes=n_nodes).to(device)
@@ -31,7 +31,7 @@ def train():
     return loss
 
 
-for epoch in range(200):
+for epoch in range(300):
     loss = train()
     if epoch % 100 == 0:
         print("Running epoch {} with a loss of {}".format(epoch, loss))
