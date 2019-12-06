@@ -9,7 +9,7 @@ class MsgPassLayer(MessagePassing):
     def __init__(self, in_dim, out_dim):
         # Message passing with max aggregation.
         super(MsgPassLayer, self).__init__(aggr='add')
-        self.mlp = MLP(2*in_dim, out_dim)
+        self.mlp = MLP(in_dim, out_dim)
         self.update_mlp = MLP(2 * in_dim, out_dim)
 
     def forward(self, x, edge_index):
@@ -46,7 +46,7 @@ class MsgPassLayer(MessagePassing):
         """
         #tmp_x = torch.cat([x_j, x_i], dim=1)
         tmp_x = x_j
-        return tmp_x #self.mlp(tmp_x)  # 0.5 *  x_j
+        return self.mlp(tmp_x)  # 0.5 *  x_j
 
     def update(self, aggr_out, x):
         # Todo: Understand how to properly use this
@@ -76,7 +76,7 @@ class Net(torch.nn.Module):
         # Todo:Investigate on better propagation models for infromation propagation
         x, edge_index = data.x, data.edge_index
         x = self.msg_passing_1(x, edge_index)
-        x = self.msg_passing_2(x, edge_index)
+        #x = self.msg_passing_2(x, edge_index)
 
         # We ask an oracle to look at the hidden messages to deduce the locations of the trains
         new_shape = int(x.shape[0] / self.nodesize)

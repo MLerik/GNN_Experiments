@@ -61,7 +61,7 @@ class TrainScheduleDataset(InMemoryDataset):
         data_list = []
         self.edge_index = edge_index
         # Loop over all possible positions (5 Nodes in this example)
-        for node in range(500):
+        for node in range(1000):
             tmp_data = self.generate_data_point(position=None)
 
             data_list.append(tmp_data)
